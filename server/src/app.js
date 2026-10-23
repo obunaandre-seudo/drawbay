@@ -34,7 +34,13 @@ app.use(helmet({
 app.use((req, res, next) => cors({
   origin(origin, callback) {
     let sameOrigin = false;
-    try { sameOrigin = !!origin && new URL(origin).origin === `${req.protocol}://${req.get('host')}`; } catch {}
+    try {
+      const requestOrigin = new URL(origin);
+      sameOrigin = !!origin && requestOrigin.origin === `${req.protocol}://${req.get('host')}`;
+      if (!sameOrigin && origin && ['http:', 'https:'].includes(requestOrigin.protocol)) {
+        sameOrigin = requestOrigin.host.toLowerCase() === String(req.get('host') || '').toLowerCase();
+      }
+    } catch {}
     if (!origin || sameOrigin || origins.has(origin)) return callback(null, true);
     callback(new Error('Origin is not allowed'));
   },
