@@ -18,10 +18,11 @@ import { query } from './db.js';
 export const app = express();
 const originList=(process.env.CORS_ORIGIN || 'http://localhost:5173').split(',').map(x=>x.trim()).filter(Boolean);
 if(process.env.APP_URL)originList.push(new URL(process.env.APP_URL).origin);
+if(process.env.VERCEL_URL)originList.push(`https://${process.env.VERCEL_URL}`);
 const origins = new Set(originList);
 const s3Origin = process.env.S3_ENDPOINT ? new URL(process.env.S3_ENDPOINT).origin : 'https://*.amazonaws.com';
 app.disable('x-powered-by');
-app.set('trust proxy', process.env.TRUST_PROXY === 'true' ? 1 : false);
+app.set('trust proxy', process.env.TRUST_PROXY === 'true' || process.env.VERCEL === '1' || !!process.env.VERCEL_URL ? 1 : false);
 app.use(helmet({
   contentSecurityPolicy: { directives: {
     defaultSrc: ["'self'"], imgSrc: ["'self'", 'data:', 'blob:', 'https://images.unsplash.com'],
