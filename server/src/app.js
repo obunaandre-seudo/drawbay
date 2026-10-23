@@ -17,7 +17,9 @@ import { query } from './db.js';
 
 export const app = express();
 const originList=(process.env.CORS_ORIGIN || 'http://localhost:5173').split(',').map(x=>x.trim()).filter(Boolean);
-originList.push(new URL(process.env.APP_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` || 'https://drawbayx.vercel.app').origin);
+if(process.env.APP_URL)originList.push(new URL(process.env.APP_URL).origin);
+if(process.env.VERCEL_PROJECT_PRODUCTION_URL)originList.push(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
+originList.push('https://drawbayx.vercel.app');
 if(process.env.VERCEL_URL)originList.push(`https://${process.env.VERCEL_URL}`);
 const origins = new Set(originList);
 const s3Origin = process.env.S3_ENDPOINT ? new URL(process.env.S3_ENDPOINT).origin : 'https://*.amazonaws.com';
