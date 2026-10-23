@@ -4,8 +4,9 @@ import { query, hash } from './lib.js';
 export async function seedAdmin() {
   const email = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
   const password = process.env.ADMIN_PASSWORD || '';
-  if (!email || password.length < 16) {
-    console.warn('Admin account was not seeded. Set ADMIN_EMAIL and an ADMIN_PASSWORD of at least 16 characters to create one.');
+  const minimumPasswordLength = process.env.NODE_ENV === 'production' ? 16 : 12;
+  if (!email || password.length < minimumPasswordLength) {
+    console.warn(`Admin account was not seeded. Set ADMIN_EMAIL and an ADMIN_PASSWORD of at least ${minimumPasswordLength} characters to create one.`);
     return;
   }
   const name = process.env.ADMIN_NAME || 'DrawBay Administrator';
