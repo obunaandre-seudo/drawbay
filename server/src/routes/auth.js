@@ -15,6 +15,9 @@ export default function authRoutes(app) {
   }));
 
   app.post('/api/auth/register', wrap(async (req, res) => {
+    if (process.env.NODE_ENV === 'production' && (!process.env.RESEND_API_KEY || !process.env.EMAIL_FROM)) {
+      return res.status(503).json({ error: 'Account verification email is not configured. Contact the site administrator.' });
+    }
     const role = req.body?.role;
     const name = String(req.body?.name || '').trim();
     const email = String(req.body?.email || '').trim().toLowerCase();
@@ -37,7 +40,10 @@ export default function authRoutes(app) {
     if (!user) return res.status(409).json({ error: 'An account with that email already exists' });
     await log(email, `Registered ${role} account`);
     try { await sendToken(user, 'verify'); }
-    catch (e) { console.error('Verification email could not be sent:', e.message); }
+    catch (e) {
+      console.error('Verification email could not be sent:', e.message);
+      return res.status(503).json({ error: 'Your account was created, but the verification email could not be sent. Use the resend verification option or contact support.' });
+    }
     res.status(201).json({ message: 'Check your inbox for a verification link.' });
   }));
 

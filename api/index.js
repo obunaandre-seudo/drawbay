@@ -1,18 +1,37 @@
-import { app } from '../server/src/app.js';
-import { migrate } from '../server/src/db.js';
-import { seedAdmin } from '../server/src/bootstrap.js';
 import { getExpressApiUrl } from './routing.js';
+import { getProductionConfigProblems } from './production-config.js';
 
 let startup;
 
+async function initialize() {
+  const problems = getProductionConfigProblems(process.env);
+  if (problems.length) {
+    throw new Error(`Missing or invalid production configuration: ${problems.join(', ')}`);
+  }
+
+  const [{ app }, { migrate }, { seedAdmin }] = await Promise.all([
+    import('../server/src/app.js'),
+    import('../server/src/db.js'),
+    import('../server/src/bootstrap.js')
+  ]);
+
+  await migrate();
+  await seedAdmin();
+  return app;
+}
+
 export default async function handler(req, res) {
-  startup ??= migrate().then(seedAdmin);
+  let app;
   try {
-    await startup;
+    startup ??= initialize();
+    app = await startup;
   } catch (error) {
     startup = undefined;
     console.error('API startup failed:', error);
-    return res.status(503).json({ error: 'API startup failed' });
+    const message = error.message.startsWith('Missing or invalid production configuration:')
+      ? error.message
+      : 'API is temporarily unavailable. Check the database connection and Vercel function logs.';
+    return res.status(503).json({ error: message });
   }
 
   const apiUrl = getExpressApiUrl(req.query);
