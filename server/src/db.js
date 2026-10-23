@@ -2,11 +2,13 @@ import pg from 'pg';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getDatabaseUrl } from '../../api/production-config.js';
 
 const { Pool } = pg;
-if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) throw new Error('DATABASE_URL is required in production');
+const connectionString = getDatabaseUrl(process.env);
+if (process.env.NODE_ENV === 'production' && !connectionString) throw new Error('DATABASE_URL or POSTGRES_URL is required in production');
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString,
   ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: true } : undefined,
   max: Number(process.env.DB_POOL_SIZE || 10),
   idleTimeoutMillis: 30_000,

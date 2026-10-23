@@ -46,6 +46,8 @@ test('reports missing production configuration instead of crashing the function'
 test('checks production credentials used to start the API', () => {
   assert.deepEqual(getProductionConfigProblems({ NODE_ENV: 'development' }), []);
   assert.deepEqual(getProductionConfigProblems({ NODE_ENV: 'production' }), [
-    'DATABASE_URL', 'JWT_SECRET'
+    'DATABASE_URL (or POSTGRES_URL)', 'JWT_SECRET'
   ]);
+  assert.deepEqual(getProductionConfigProblems({ NODE_ENV: 'production', POSTGRES_URL: 'postgres://example', JWT_SECRET: 'x'.repeat(32) }), []);
+  assert.deepEqual(getProductionConfigProblems({ NODE_ENV: 'production', DATABASE_URL: 'postgres://example', JWT_SECRET: 'x'.repeat(32) }), []);
 });
