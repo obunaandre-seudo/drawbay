@@ -31,7 +31,8 @@ export default async function handler(req, res) {
     const message = error.message.startsWith('Missing or invalid production configuration:')
       ? error.message
       : 'API is temporarily unavailable. Check the database connection and Vercel function logs.';
-    return res.status(503).json({ error: message });
+    const diagnosticCode = typeof error?.code === 'string' ? error.code : error?.name;
+    return res.status(503).json({ error: message, ...(diagnosticCode ? { diagnosticCode } : {}) });
   }
 
   const apiUrl = getExpressApiUrl(req.query);

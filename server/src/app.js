@@ -43,8 +43,9 @@ app.get('/api/health', async (_req, res) => {
   try {
     await query('SELECT 1');
     res.json({ status: 'ok' });
-  } catch {
-    res.status(503).json({ status: 'unavailable' });
+  } catch (error) {
+    const diagnosticCode = typeof error?.code === 'string' ? error.code : error?.name;
+    res.status(503).json({ status: 'unavailable', ...(diagnosticCode ? { diagnosticCode } : {}) });
   }
 });
 app.get('/robots.txt', (req, res) => {
