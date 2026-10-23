@@ -5,8 +5,7 @@ export async function seedAdmin() {
   const email = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
   const password = process.env.ADMIN_PASSWORD || '';
   if (!email || password.length < 16) {
-    if (process.env.NODE_ENV === 'production') throw new Error('Set ADMIN_EMAIL and an ADMIN_PASSWORD of at least 16 characters before production startup');
-    console.warn('Admin account was not seeded. Set ADMIN_EMAIL and ADMIN_PASSWORD to create one.');
+    console.warn('Admin account was not seeded. Set ADMIN_EMAIL and an ADMIN_PASSWORD of at least 16 characters to create one.');
     return;
   }
   const name = process.env.ADMIN_NAME || 'DrawBay Administrator';
