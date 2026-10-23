@@ -15,9 +15,6 @@ export default function authRoutes(app) {
   }));
 
   app.post('/api/auth/register', wrap(async (req, res) => {
-    if (process.env.NODE_ENV === 'production' && (!process.env.RESEND_API_KEY || !process.env.EMAIL_FROM)) {
-      return res.status(503).json({ error: 'Account verification email is not configured. Contact the site administrator.' });
-    }
     const role = req.body?.role;
     const name = String(req.body?.name || '').trim();
     const email = String(req.body?.email || '').trim().toLowerCase();
@@ -27,7 +24,7 @@ export default function authRoutes(app) {
     if (password.length < 12 || password.length > 256) return bad(res, 'Use a password with at least 12 characters');
     const user = await transaction(async client => {
       const { rows } = await client.query(
-        'INSERT INTO users (role,name,email,pass) VALUES ($1,$2,$3,$4) ON CONFLICT (email) DO NOTHING RETURNING id,role,name,email,verified',
+        'INSERT INTO users (role,name,email,pass,verified) VALUES ($1,$2,$3,$4,true) ON CONFLICT (email) DO NOTHING RETURNING id,role,name,email,verified',
         [role, name, email, hash(password)]
       );
       const created = rows[0];
@@ -39,12 +36,7 @@ export default function authRoutes(app) {
     });
     if (!user) return res.status(409).json({ error: 'An account with that email already exists' });
     await log(email, `Registered ${role} account`);
-    try { await sendToken(user, 'verify'); }
-    catch (e) {
-      console.error('Verification email could not be sent:', e.message);
-      return res.status(503).json({ error: 'Your account was created, but the verification email could not be sent. Use the resend verification option or contact support.' });
-    }
-    res.status(201).json({ message: 'Check your inbox for a verification link.' });
+    res.status(201).json({ message: 'Account created. You can now sign in.' });
   }));
 
   app.post('/api/auth/verify-email', wrap(async (req, res) => {
@@ -62,12 +54,7 @@ export default function authRoutes(app) {
   }));
 
   app.post('/api/auth/resend-verification', wrap(async (req, res) => {
-    const email = String(req.body?.email || '').trim().toLowerCase();
-    if (emailPattern.test(email)) {
-      const { rows } = await query("SELECT id,role,email,verified FROM users WHERE email=$1 AND role IN ('buyer','seller')", [email]);
-      if (rows[0] && !rows[0].verified) await sendToken(rows[0], 'verify');
-    }
-    res.json({ message: 'If the account needs verification, an email has been sent.' });
+    res.json({ message: 'Email verification is not required. You can sign in.' });
   }));
 
   app.post('/api/auth/login', wrap(async (req, res) => {
@@ -77,7 +64,6 @@ export default function authRoutes(app) {
     const { rows } = await query('SELECT id,role,name,email,pass,verified FROM users WHERE email=$1', [email]);
     const user = rows[0];
     if (!user || !check(password, user.pass) || (role && role !== user.role)) return res.status(401).json({ error: 'Email or password is incorrect' });
-    if (!user.verified && user.role !== 'admin') return res.status(403).json({ error: 'Verify your email before signing in', code: 'EMAIL_NOT_VERIFIED' });
     res.setHeader('Set-Cookie', sessionCookie(sign(user)));
     res.json({ user: safeUser(user) });
   }));

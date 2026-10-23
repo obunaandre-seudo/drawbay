@@ -22,7 +22,7 @@ export function AuthForm({role,mode}:{role:Role;mode:'sign-in'|'sign-up'|'forgot
     setBusy(true);
     try{
       if(mode==='sign-in'){await api.signIn(role,v.email,v.password);const target=params.get('returnTo')||`/${role}/dashboard`;nav(target.startsWith('/')&&!target.startsWith('//')?target:`/${role}/dashboard`,{replace:true});return;}
-      if(mode==='sign-up'){const r:any=await api.signUp(role as Exclude<Role,'admin'>,v.name,v.email,v.password);setDone(r.message||'Check your inbox for a verification link.');return;}
+      if(mode==='sign-up'){const r:any=await api.signUp(role as Exclude<Role,'admin'>,v.name,v.email,v.password);setDone(r.message||'Account created. You can now sign in.');return;}
       if(mode==='forgot-password'){const r:any=await api.requestPasswordReset(v.email);setDone(r.message);return;}
       if(mode==='reset-password'){const r:any=await api.resetPassword(token,v.password);setDone(r.message);return;}
     }catch(error:any){setErr({form:error.message});}
