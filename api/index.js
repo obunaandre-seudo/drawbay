@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     return res.status(503).json({ error: message, ...(diagnosticCode ? { diagnosticCode } : {}) });
   }
 
-  const apiUrl = getExpressApiUrl(req.query);
+  const apiUrl = getExpressApiUrl(req.query, req.url);
   if (!apiUrl) {
     return res.status(404).json({ error: 'API route not found' });
   }

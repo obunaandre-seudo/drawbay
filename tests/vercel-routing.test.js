@@ -11,6 +11,27 @@ test('routes account registration to the Express registration endpoint', () => {
   );
 });
 
+test('routes the original API URL when the rewrite parameter is absent', () => {
+  assert.equal(
+    getExpressApiUrl({}, '/api/auth/register'),
+    '/api/auth/register'
+  );
+});
+
+test('reads the rewrite path from the function URL when query parsing is absent', () => {
+  assert.equal(
+    getExpressApiUrl({}, '/api/index?__drawbay_path=auth%2Fregister'),
+    '/api/auth/register'
+  );
+});
+
+test('accepts wildcard path segments supplied as an array', () => {
+  assert.equal(
+    getExpressApiUrl({ __drawbay_path: ['auth', 'register'] }),
+    '/api/auth/register'
+  );
+});
+
 test('preserves API query parameters and removes the internal rewrite parameter', () => {
   assert.equal(
     getExpressApiUrl({ __drawbay_path: 'projects', category: 'houses', page: ['1', '2'] }),

@@ -11,8 +11,8 @@
       "destination": "/api/index?__drawbay_path=:path*"
     },
     {
-      "source": "/((?!api/).*)",
-      "destination": "/"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
