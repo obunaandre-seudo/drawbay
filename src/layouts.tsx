@@ -1,0 +1,31 @@
+import { useState, type FormEvent } from 'react';
+import { Link, NavLink, Outlet, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Logo, ThemeToggle, Toaster } from './ui';
+import { useDb, setSession, stateReady } from './services/api';
+import type { Role } from './types';
+export function PublicLayout() {
+  const [o,setO]=useState(false); const [searchOpen,setSearchOpen]=useState(false); const [search,setSearch]=useState(''); const db=useDb(); const navigate=useNavigate(); const n=db.cart.reduce((sum,item)=>sum+item.qty,0);
+  const submitSearch=(event:FormEvent<HTMLFormElement>)=>{event.preventDefault();const q=search.trim();if(q)navigate(`/search?q=${encodeURIComponent(q)}`);else navigate('/projects');setO(false)};
+  return <><a href="#main" className="skip">Skip to content</a><header className={`top store-head ${searchOpen?'search-open':''}`}>
+    <div className="store-main"><Link to="/" aria-label="DrawBay home"><Logo/></Link>
+      <nav className={`store-nav ${o?'open':''}`} aria-label="Shop navigation" onClick={()=>setO(false)}><NavLink to="/marketplace">Shop</NavLink><NavLink to="/categories/residential-houses">Residential</NavLink><NavLink to="/categories/apartments">Apartments</NavLink><NavLink to="/categories/interior-designs">Interiors</NavLink><NavLink to="/about">About DrawBay</NavLink></nav>
+      <form className="store-search" role="search" onSubmit={submitSearch}><input aria-label="Search architectural plans" placeholder="Search plans, styles, and spaces" value={search} onChange={e=>setSearch(e.target.value)}/><button type="submit" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg></button></form>
+      <div className="store-actions"><button className="store-action search-toggle" type="button" aria-label="Search" aria-expanded={searchOpen} onClick={()=>setSearchOpen(value=>!value)}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg></button><ThemeToggle/><Link className="store-action account-action" to={db.session?`/${db.session}/dashboard`:'/get-started'} aria-label={db.session?'My account':'Sign in'} title={db.session?'My account':'Sign in'}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg></Link><Link className="store-action icon-action" to="/wishlist" aria-label={`Wishlist, ${db.wishlist.length} saved items`} title="Wishlist"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 11-8.8 11s-8.8-5.8-8.8-11a4.7 4.7 0 0 1 8.8-2.2 4.7 4.7 0 0 1 8.8 2.2Z"/></svg>{db.wishlist.length>0&&<b className="action-count">{db.wishlist.length}</b>}</Link><Link className="store-action icon-action" to="/cart" aria-label={`Cart, ${n} items`} title="Shopping bag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l1 13H4L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>{n>0&&<b className="action-count">{n}</b>}</Link><button className="store-action menu store-menu" aria-label="Toggle menu" aria-expanded={o} onClick={()=>setO(!o)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
+    </div>
+  </header>
+  <div id="main"><Outlet/></div><Toaster/>
+  <footer className="foot"><div><Logo/><p>The marketplace for architectural plans.</p></div><div><Link to="/terms">Terms</Link><Link to="/privacy">Privacy</Link><Link to="/refund-policy">Refunds</Link><Link to="/seller-agreement">Seller agreement</Link></div><div><Link to="/seller/sign-in">Seller sign-in</Link><Link to="/buyer/sign-in">Buyer sign-in</Link><Link to="/admin/sign-in">Admin</Link></div></footer></>;
+}
+const NAV:Record<Role,[string,string][]> = {
+ buyer:[['dashboard','Overview'],['purchases','Purchases'],['downloads','Downloads'],['profile','Profile'],['notifications','Notifications'],['support','Support']],
+ seller:[['dashboard','Overview'],['projects','My projects'],['projects/new','Upload project'],['sales','Sales'],['orders','Orders'],['earnings','Earnings'],['payouts','Payouts'],['analytics','Analytics'],['profile','Profile'],['settings','Settings'],['notifications','Notifications']],
+ admin:[['dashboard','Dashboard'],['reviews','Review queue'],['projects','Projects'],['sellers','Sellers'],['buyers','Buyers'],['orders','Orders'],['upload-fees','Upload fees'],['transactions','Transactions'],['commissions','Commissions'],['payouts','Payouts'],['refunds','Refunds'],['categories','Categories'],['content','Content'],['support','Support'],['settings','Settings'],['audit-log','Audit log'],['profile','Profile']] };
+export function DashLayout({role}:{role:Role}) {
+  const db=useDb(); const [o,setO]=useState(false); const loc=useLocation();
+  if(!stateReady) return <main className="center" aria-busy="true">Loading your account…</main>;
+  if(!db.session) return <Navigate to={`/${role}/sign-in`} replace/>;
+  if(db.session!==role) return <Navigate to="/access-denied" replace/>;
+  const crumbs=loc.pathname.split('/').filter(Boolean);
+  return <div className="dash"><aside className={o?'open':''}><Link to="/"><Logo/></Link><small className="cap">{role} area</small>{NAV[role].map(([p,l])=><NavLink key={p} end to={`/${role}/${p}`} onClick={()=>setO(false)}>{l}</NavLink>)}<button className="link" onClick={()=>{void setSession(null)}}>Sign out</button></aside>
+  <section><header className="bar"><button className="btn ghost menu" onClick={()=>setO(!o)} aria-expanded={o}>☰ Menu</button><nav aria-label="Breadcrumb" className="crumbs">{crumbs.join(' / ')}</nav><div className="row"><ThemeToggle/><Link to={`/${role}/notifications`}>Notifications ({db.notifications.length})</Link></div></header><main className="pad"><Outlet/></main></section><Toaster/></div>;
+}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="48" y1="30" x2="1118" y2="622" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#26243f"/>
+      <stop offset="1" stop-color="#111725"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="691" y1="104" x2="1050" y2="541" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a99cff" stop-opacity=".38"/>
+      <stop offset="1" stop-color="#58e7cf" stop-opacity=".08"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" rx="38" fill="url(#bg)"/>
+  <circle cx="917" cy="315" r="239" fill="url(#glow)"/>
+  <g stroke="#b5adff" stroke-opacity=".82" stroke-width="3">
+    <path d="M708 438V244l166-100 184 100v194H708Z"/>
+    <path d="M708 244h350M874 144v294M874 294h184M956 244v194M752 294h122M752 294v144"/>
+    <path d="m690 250 184-116 204 116M734 456h348" stroke="#62e7d2"/>
+  </g>
+  <rect x="78" y="78" width="48" height="48" rx="14" fill="#a99cff"/>
+  <path d="M90 90h24v24H90zM90 101h11v13M101 101h13M108 90v11" stroke="#24223b" stroke-width="2" stroke-linecap="round"/>
+  <text x="144" y="113" fill="#fff" font-family="Arial,sans-serif" font-size="31" font-weight="700" letter-spacing="-1">DrawBay</text>
+  <text x="80" y="295" fill="#c5bbff" font-family="Arial,sans-serif" font-size="17" font-weight="700" letter-spacing="4">ARCHITECTURAL DESIGN MARKETPLACE</text>
+  <text x="76" y="366" fill="#fff" font-family="Georgia,serif" font-size="56" font-weight="600" letter-spacing="-2">Plans for the places</text>
+  <text x="76" y="430" fill="#fff" font-family="Georgia,serif" font-size="56" font-weight="600" letter-spacing="-2">we call home.</text>
+  <text x="80" y="492" fill="#c4c5d3" font-family="Arial,sans-serif" font-size="21">Discover thoughtful plans from independent designers.</text>
+</svg>

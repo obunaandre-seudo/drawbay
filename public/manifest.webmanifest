@@ -1,0 +1,17 @@
+{
+  "name": "DrawBay — Architectural Plans Marketplace",
+  "short_name": "DrawBay",
+  "description": "Discover architectural plans and digital project files from independent designers.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#f5f6fc",
+  "theme_color": "#f5f6fc",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
