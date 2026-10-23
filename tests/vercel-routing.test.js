@@ -58,6 +58,7 @@ test('reports missing production configuration instead of crashing the function'
     assert.equal(response.statusCode, 503);
     assert.match(response.body.error, /DATABASE_URL/);
     assert.match(response.body.error, /JWT_SECRET/);
+    assert.equal(response.body.diagnosticStage, 'configuration');
   } finally {
     if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
     else process.env.NODE_ENV = previousNodeEnv;
