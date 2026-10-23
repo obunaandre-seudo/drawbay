@@ -16,7 +16,7 @@ async function initialize() {
   ]);
 
   await migrate();
-  await seedAdmin();
+  if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) await seedAdmin();
   return app;
 }
 

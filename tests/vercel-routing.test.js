@@ -46,6 +46,6 @@ test('reports missing production configuration instead of crashing the function'
 test('checks production credentials used to start the API', () => {
   assert.deepEqual(getProductionConfigProblems({ NODE_ENV: 'development' }), []);
   assert.deepEqual(getProductionConfigProblems({ NODE_ENV: 'production' }), [
-    'DATABASE_URL', 'JWT_SECRET', 'ADMIN_EMAIL', 'ADMIN_PASSWORD', 'APP_URL', 'RESEND_API_KEY', 'EMAIL_FROM'
+    'DATABASE_URL', 'JWT_SECRET'
   ]);
 });

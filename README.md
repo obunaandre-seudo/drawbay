@@ -19,7 +19,7 @@ Build and run the included Docker image behind a TLS reverse proxy. Keep Postgre
 
 Import the repository with the project root as the **Root Directory** and **Vite** as the framework preset. The included `vercel.json` sends frontend routes to the Vite-built SPA and `/api/*` requests to the Express serverless function. Vercel uses `npm run build` and `dist` for the frontend.
 
-Add the production environment variables below in Vercel Project Settings before using the API. At minimum, set `DATABASE_URL`, `JWT_SECRET` (32+ random characters), `ADMIN_EMAIL`, and `ADMIN_PASSWORD` (16+ characters). Configure the remaining email, payment, and object-storage variables before enabling those features. Set `APP_URL` to the deployed HTTPS URL and `PAYSTACK_SECRET_KEY` to a live key for production commerce. Use a managed PostgreSQL database and set `DATABASE_SSL=true` when its provider requires TLS. The function applies the SQL schema and seeds the initial admin account on its first request after a cold start.
+For the storefront and core API, set `DATABASE_URL` and `JWT_SECRET` (32+ random characters). Use a managed PostgreSQL database and set `DATABASE_SSL=true` when its provider requires TLS. The function applies the SQL schema on its first API request after a cold start. Admin, email, payment, and object-storage settings are optional; the related features stay unavailable until configured. The initial admin account is seeded only when both `ADMIN_EMAIL` and `ADMIN_PASSWORD` are set.
 
 Vercel project settings:
 
