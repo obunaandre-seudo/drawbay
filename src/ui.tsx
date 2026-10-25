@@ -4,7 +4,7 @@ import { useDb, toggleWishlist } from './services/api';
 import type { Project } from './types';
 export const money = (n:number) => new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN',maximumFractionDigits:0}).format(n||0);
 export const slug = (s:string) => s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-export const Logo = () => <span className="logo"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M2 2h22v22H2zM2 12h10v12M12 12h12M18 2v10" fill="none" stroke="currentColor" strokeWidth="1.8"/></svg>DrawBay</span>;
+export const Logo = () => <span className="logo"><img src="/ves.png" alt="" aria-hidden="true"/>DrawBay</span>;
 export function ThemeToggle() {
   const [dark,setDark] = useState(() => {
     const saved = localStorage.getItem('drawbay:theme');

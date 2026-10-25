@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { useState, type FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Img, Card, slug } from '../../ui';
 import { useDb } from '../../services/api';
 
@@ -12,17 +13,31 @@ const categories = [
 
 export function Welcome() {
   const db = useDb();
+  const navigate = useNavigate();
+  const [search, setSearch] = useState('');
   const featured = db.projects.filter(p => p.status === 'published' && p.featured).slice(0, 3);
   const availableCategories = db.categories.length ? db.categories.slice(0, 4) : categories.map(([, name]) => name);
+  const submitSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const query = search.trim();
+    navigate(query ? `/search?q=${encodeURIComponent(query)}` : '/projects');
+  };
 
   return <main className="home-page">
     <section className="home-hero">
       <Img src={HERO} alt="Sculptural contemporary home set among trees" className="home-hero-image" />
       <div className="home-hero-shade" />
       <div className="home-hero-copy">
-        <span className="home-kicker"><i /> A home for considered design</span>
-        <h1>Make room<br /><em>for better living.</em></h1>
-        <p>Discover beautifully resolved architectural plans, made by independent studios for the way you want to live.</p>
+        <span className="home-kicker"><i /> Architectural plans, made for what’s next</span>
+        <h1>Build Better<br /><em>With Great Plans.</em></h1>
+        <p>Discover, buy and download architectural plans and professional design files from independent architects and studios.</p>
+        <form className="home-search" role="search" onSubmit={submitSearch}>
+          <input aria-label="Search architectural plans" placeholder="Search plans, styles, or spaces" value={search} onChange={event => setSearch(event.target.value)} />
+          <button type="submit">Search plans</button>
+        </form>
+        <nav className="home-quick-links" aria-label="Popular plan categories">
+          {availableCategories.map((category, index) => <Link key={category} to={`/categories/${slug(category)}`}><span>{String(index + 1).padStart(2, '0')}</span>{category}</Link>)}
+        </nav>
         <div className="home-actions"><Link className="home-button" to="/marketplace">Explore the collection <span>↗</span></Link><Link className="home-text-link" to="/seller/sign-up">For design studios <span>↗</span></Link></div>
       </div>
       <div className="home-hero-index"><span>DRAWBAY / 001</span><span>Design for living, thoughtfully.</span></div>
