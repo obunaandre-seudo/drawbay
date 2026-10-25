@@ -7,7 +7,7 @@ import type { Project, Role } from '../../types';
 import { Stat, pname, Notifs, ProfileForm, Support } from '../../components/common';
 
 export const GetStarted = () => <main className="wrap audience-page">
-  <header className="audience-intro"><span className="audience-eyebrow">YOUR NEXT CHAPTER STARTS HERE</span><h1>What brings you to DrawBay?</h1><p>Find the right space for your plans, or share your work with people ready to build.</p></header>
+  <header className="audience-intro"><span className="audience-eyebrow">YOUR NEXT CHAPTER STARTS HERE</span><h1>What brings you to Guaranteed Impressions?</h1><p>Find the right space for your plans, or share your work with people ready to build.</p></header>
   <div className="audience-grid">
     <article className="audience-card buyer-card">
       <div className="audience-image"><Img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=85" alt="A home buyer holding keys in front of a new home"/><span className="audience-image-tag">FIND YOUR PLACE</span></div>

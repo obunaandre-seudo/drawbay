@@ -7,7 +7,7 @@ export default function SellerPayouts(){
   const [bankCode,setBankCode]=useState(''); const [number,setNumber]=useState(''); const [error,setError]=useState(''); const [busy,setBusy]=useState(false);
   useEffect(()=>{api.getBanks().then(setBanks).catch((e:any)=>setError(e.message));api.getPayoutAccount().then(setAccount).catch((e:any)=>setError(e.message))},[]);
   const save=async(e:any)=>{e.preventDefault();setBusy(true);setError('');try{const result=await api.savePayoutAccount(number,bankCode);setAccount(result);setNumber('')}catch(e:any){setError(e.message)}finally{setBusy(false)}};
-  return <div><h1>Payouts</h1><p>Keep your verified payout destination current. DrawBay sends approved earnings through Paystack.</p>
+  return <div><h1>Payouts</h1><p>Keep your verified payout destination current. Guaranteed Impressions sends approved earnings through Paystack.</p>
     <Table rows={db.payouts} cols={[
       ['id','Payout'],['date','Date'],['amount','Amount',r=>money(r.amount)],['status','Status',r=><Badge s={r.status}/>]
     ]}/>
@@ -15,6 +15,6 @@ export default function SellerPayouts(){
     <form className="narrow" onSubmit={save}><Field as="select" label="Nigerian bank" value={bankCode} onChange={(e:any)=>setBankCode(e.target.value)} required><option value="">Select a bank</option>{banks.map(b=><option key={b.code} value={b.code}>{b.name}</option>)}</Field>
       <Field label="10-digit account number" inputMode="numeric" autoComplete="off" value={number} onChange={(e:any)=>setNumber(e.target.value)} required/>
       {error&&<p className="err" role="alert">{error}</p>}<button className="btn" disabled={busy||!bankCode||number.length!==10}>{busy?'Verifying…':'Verify and save account'}</button>
-    </form><small>Your account number is sent over TLS to Paystack to create a transfer recipient. DrawBay stores only the provider reference and last four digits.</small>
+    </form><small>Your account number is sent over TLS to Paystack to create a transfer recipient. Guaranteed Impressions stores only the provider reference and last four digits.</small>
   </div>;
 }

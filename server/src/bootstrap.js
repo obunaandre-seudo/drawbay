@@ -9,7 +9,7 @@ export async function seedAdmin() {
     console.warn(`Admin account was not seeded. Set ADMIN_EMAIL and an ADMIN_PASSWORD of at least ${minimumPasswordLength} characters to create one.`);
     return;
   }
-  const name = process.env.ADMIN_NAME || 'DrawBay Administrator';
+  const name = process.env.ADMIN_NAME || 'Guaranteed Impressions Administrator';
   await query(
     "INSERT INTO users (role,name,email,pass,verified) VALUES ('admin',$1,$2,$3,true) ON CONFLICT (email) DO NOTHING",
     [name, email, hash(password)]

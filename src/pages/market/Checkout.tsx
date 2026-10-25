@@ -14,7 +14,7 @@ export function Checkout() {
     {!db.session&&<p className="note">Sign in or create a buyer account to continue. Your cart will be kept while you sign in.</p>}
     {error&&<p role="alert" className="err">{error}</p>}
     <div className="row"><button className="btn" onClick={checkout} disabled={busy}>{busy?'Connecting to payment…':db.session?'Continue to Paystack':'Sign in to continue'}</button><Link to="/cart">Edit cart</Link></div>
-    <small>Payments are verified securely by DrawBay before files become available.</small>
+    <small>Payments are verified securely by Guaranteed Impressions before files become available.</small>
   </main>;
 }
 export default Checkout;

@@ -16,7 +16,7 @@ try {
   }
   await migrate();
   await seedAdmin();
-  const server = app.listen(PORT, () => console.info(`DrawBay listening on port ${PORT}`));
+  const server = app.listen(PORT, () => console.info(`Guaranteed Impressions listening on port ${PORT}`));
   const shutdown = signal => server.close(async () => { await pool.end(); console.info(`Closed after ${signal}`); process.exit(0); });
   process.on('SIGTERM', () => shutdown('SIGTERM'));
   process.on('SIGINT', () => shutdown('SIGINT'));

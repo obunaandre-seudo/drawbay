@@ -1,6 +1,6 @@
-# DrawBay
+# Guaranteed Impressions
 
-DrawBay is a full-stack marketplace for architectural plans and digital project files. The web client uses a PostgreSQL-backed Express API. Accounts, listings, reviews, carts, payments, orders, downloads, support requests and payout records are stored server-side.
+Guaranteed Impressions is a full-stack marketplace for architectural plans and digital project files. The web client uses a PostgreSQL-backed Express API. Accounts, listings, reviews, carts, payments, orders, downloads, support requests and payout records are stored server-side.
 
 ## Start locally
 
@@ -48,7 +48,7 @@ The server computes checkout amounts from published listings and initializes Pay
 
 Seller files upload directly to private S3-compatible storage using short-lived signed URLs. Only paid buyers can request five-minute download links. Listing previews are served through a public, read-only preview endpoint after publication. Configure malware scanning and moderation for user-uploaded files before opening uploads to the public.
 
-Paystack transfers require a funded platform balance and transfer approval settings on the Paystack account. Seller payout destinations are registered with Paystack; DrawBay stores only the recipient reference and masked account details. Payout status changes to completed or failed only after signed Paystack transfer webhooks.
+Paystack transfers require a funded platform balance and transfer approval settings on the Paystack account. Seller payout destinations are registered with Paystack; Guaranteed Impressions stores only the recipient reference and masked account details. Payout status changes to completed or failed only after signed Paystack transfer webhooks.
 
 ## Project structure
 
@@ -62,6 +62,6 @@ The API exposes `GET /api/health` for deployment health checks. It returns HTTP 
 
 ## Launch requirements
 
-This repository contains the production-oriented application code and deployment scaffold. It cannot be made publicly live from the local workspace alone: deployment still needs the business’s domain/hosting account, production PostgreSQL, Paystack live account and webhook, email sender verification, private object-storage bucket, and production secrets. Before accepting customers, publish counsel-reviewed terms, privacy/refund policies, and complete the applicable business, tax, consumer-protection, and data-protection reviews for the markets where DrawBay will operate.
+This repository contains the production-oriented application code and deployment scaffold. It cannot be made publicly live from the local workspace alone: deployment still needs the business’s domain/hosting account, production PostgreSQL, Paystack live account and webhook, email sender verification, private object-storage bucket, and production secrets. Before accepting customers, publish counsel-reviewed terms, privacy/refund policies, and complete the applicable business, tax, consumer-protection, and data-protection reviews for the markets where Guaranteed Impressions will operate.
 
 The current environment could not download npm dependencies, so the frontend build and live browser preview have not yet been verified here.

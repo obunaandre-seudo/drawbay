@@ -10,6 +10,6 @@ export default function contactRoutes(app) {
     if(email.length>254||!/^\S+@\S+\.\S+$/.test(email))return bad(res,'Enter a valid email address');
     if(message.length<10||message.length>5000)return bad(res,'Message must be 10 to 5000 characters');
     await query('INSERT INTO contact_messages (name,email,message) VALUES ($1,$2,$3)',[name,email,message]);
-    res.status(201).json({message:'Your message has been sent to the DrawBay team.'});
+    res.status(201).json({message:'Your message has been sent to the Guaranteed Impressions team.'});
   }));
 }

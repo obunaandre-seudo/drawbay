@@ -1,4 +1,4 @@
-# DrawBay server
+# Guaranteed Impressions server
 
 `index.js` starts the Express API, applies `src/schema.sql` to PostgreSQL, seeds the configured administrator, and serves the built frontend from `dist/`.
 

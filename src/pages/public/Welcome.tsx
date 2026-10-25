@@ -40,7 +40,7 @@ export function Welcome() {
         </nav>
         <div className="home-actions"><Link className="home-button" to="/marketplace">Explore the collection <span>↗</span></Link><Link className="home-text-link" to="/seller/sign-up">For design studios <span>↗</span></Link></div>
       </div>
-      <div className="home-hero-index"><span>DRAWBAY / 001</span><span>Design for living, thoughtfully.</span></div>
+      <div className="home-hero-index"><span>GI / 001</span><span>Design for living, thoughtfully.</span></div>
       <a className="home-scroll" href="#browse"><span /> Scroll to explore</a>
     </section>
 

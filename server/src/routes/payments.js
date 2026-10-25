@@ -66,7 +66,7 @@ async function fulfill(reference) {
     }
     await client.query('DELETE FROM cart_items WHERE buyer_id=$1 AND project_id=ANY($2::uuid[])', [current.user_id, items.map(x => x.projectId)]);
     await client.query('INSERT INTO notifications (user_id,message) VALUES ($1,$2)',[current.user_id,'Your project purchase is confirmed. Download your files from Purchases.']);
-    for(const sellerId of new Set(items.map(item=>item.sellerId)))await client.query('INSERT INTO notifications (user_id,message) VALUES ($1,$2)',[sellerId,'You made a sale on DrawBay. View your seller dashboard for details.']);
+    for(const sellerId of new Set(items.map(item=>item.sellerId)))await client.query('INSERT INTO notifications (user_id,message) VALUES ($1,$2)',[sellerId,'You made a sale on Guaranteed Impressions. View your seller dashboard for details.']);
     await log(current.user_id, `Verified order payment ${reference}`, client);
     return { payment: updated.rows[0], orders: (await client.query('SELECT * FROM orders WHERE payment_id=$1 ORDER BY created_at', [current.id])).rows };
   });
@@ -132,7 +132,7 @@ export default function paymentRoutes(app) {
         const {rows}=await client.query(`UPDATE payouts SET status=$1,failure_reason=$2 WHERE transfer_reference=$3 AND ${allowed} RETURNING seller_id,id`,
           [status,status==='failed'?String(event.data.reason||event.event).slice(0,500):null,String(event.data.reference)]);
         if(rows[0]){
-          await client.query('INSERT INTO notifications (user_id,message) VALUES ($1,$2)',[rows[0].seller_id,status==='completed'?'Your seller payout has been sent.':'Your seller payout did not complete. Contact DrawBay support.']);
+          await client.query('INSERT INTO notifications (user_id,message) VALUES ($1,$2)',[rows[0].seller_id,status==='completed'?'Your seller payout has been sent.':'Your seller payout did not complete. Contact Guaranteed Impressions support.']);
           await client.query('INSERT INTO audit (who,what) VALUES ($1,$2)',['Paystack webhook',`Payout ${rows[0].id} ${status}`]);
         }
       });

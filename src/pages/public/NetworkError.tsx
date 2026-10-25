@@ -5,4 +5,4 @@ import * as api from '../../services/api';
 import { useDb, getProjects, getProjectBySlug, searchProjects, cartAdd, toggleWishlist, cartQty, cartRemove, setSession } from '../../services/api';
 import type { Project, Role } from '../../types';
 
-export default function NetworkError(){ return <StatePage title="Connection problem" text="DrawBay could not reach the service. Check your connection and try again."/>; }
+export default function NetworkError(){ return <StatePage title="Connection problem" text="Guaranteed Impressions could not reach the service. Check your connection and try again."/>; }

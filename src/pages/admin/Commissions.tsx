@@ -10,5 +10,5 @@ export default function AdminCommissions(){  const db=useDb(); const {id}=usePar
   const sn=(i:string)=>db.sellers.find(s=>s.id===i)?.studio; const ords=db.orders.map(o=>({...o,project:pname(db,o.projectId),buyer:db.buyers.find(b=>b.id===o.buyerId)?.name,commission:o.commission ?? o.amount*db.settings.commissionRate}));
   const link=(p:string)=>(r:any)=><Link to={`/admin/${p}/${r.id}`}>{r.id}</Link>; const st2=(r:any)=><Badge s={r.status}/>;
  const k:string='commissions';
- return (<div><h1>Commissions</h1><Table rows={ords.filter(o=>o.status==='paid')} cols={[['id','Order'],['amount','Sale',r=>money(r.amount)],['commission','DrawBay commission',r=>money(r.commission)]]}/></div>);
+ return (<div><h1>Commissions</h1><Table rows={ords.filter(o=>o.status==='paid')} cols={ [['id','Order'],['amount','Sale',r=>money(r.amount)],['commission','Guaranteed Impressions commission',r=>money(r.commission)]]}/></div>);
 }

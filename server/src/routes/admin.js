@@ -145,7 +145,7 @@ export default function adminRoutes(app) {
     if(payout.error)return res.status(payout.status).json({error:payout.error});
     try{
       if(!process.env.PAYSTACK_SECRET_KEY)throw new Error('Paystack is not configured');
-      const response=await fetch('https://api.paystack.co/transfer',{method:'POST',headers:{Authorization:`Bearer ${process.env.PAYSTACK_SECRET_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({source:'balance',amount:Math.round(Number(payout.payout.amount)*100),recipient:payout.recipient,reference:payout.payout.transfer_reference,reason:`DrawBay seller payout ${payout.payout.id}`})});
+      const response=await fetch('https://api.paystack.co/transfer',{method:'POST',headers:{Authorization:`Bearer ${process.env.PAYSTACK_SECRET_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({source:'balance',amount:Math.round(Number(payout.payout.amount)*100),recipient:payout.recipient,reference:payout.payout.transfer_reference,reason:`Guaranteed Impressions seller payout ${payout.payout.id}`})});
       const body=await response.json();
       if(!response.ok||!body.status)throw new Error(body.message||'Transfer request was not accepted');
       await query('UPDATE payouts SET transfer_code=$1 WHERE id=$2',[body.data.transfer_code,payout.payout.id]);

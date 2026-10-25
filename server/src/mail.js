@@ -22,8 +22,8 @@ export async function issueToken(client, userId, purpose, baseUrl, email, role =
   const link = `${baseUrl}/${accountRole}/${purpose === 'verify' ? 'verify-email' : 'reset-password'}?token=${encodeURIComponent(raw)}&email=${encodeURIComponent(email)}`;
   await sendEmail({
     to: email,
-    subject: purpose === 'verify' ? 'Verify your DrawBay account' : 'Reset your DrawBay password',
+    subject: purpose === 'verify' ? 'Verify your Guaranteed Impressions account' : 'Reset your Guaranteed Impressions password',
     text: `Continue here: ${link}\n\nThis link expires in 24 hours.`,
-    html: `<p>Continue to DrawBay:</p><p><a href="${link}">Continue securely</a></p><p>This link expires in 24 hours.</p>`
+    html: `<p>Continue to Guaranteed Impressions:</p><p><a href="${link}">Continue securely</a></p><p>This link expires in 24 hours.</p>`
   });
 }
