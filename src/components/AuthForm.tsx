@@ -29,7 +29,7 @@ export function AuthForm({role,mode}:{role:Role;mode:'sign-in'|'sign-up'|'forgot
     finally{setBusy(false);}
   };
   const title={ 'sign-in':'Sign in','sign-up':'Create account','forgot-password':'Reset your password','reset-password':'Choose a new password','verify-email':'Verify your email' }[mode];
-  return <main className={`authbox ${mode==='sign-in'?'authbox-signin':''}`}>
+  return <main className={`authbox ${mode==='sign-in'?'authbox-signin':''} ${role==='seller'&&mode==='sign-in'?'authbox-seller-signin':''}`}>
     {mode==='sign-in'&&<section className="auth-visual" aria-label="Guaranteed Impressions architectural design marketplace">
       <span className="auth-visual-kicker"><i/> GUARANTEED IMPRESSIONS / DESIGN MARKETPLACE</span>
       <div className="auth-plan" aria-hidden="true"><span/><span/><span/><span/><span/><i/><i/><i/><b/></div>
