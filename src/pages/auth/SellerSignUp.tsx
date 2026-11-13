@@ -182,7 +182,7 @@ export default function SellerSignUp() {
 
   return <main className="seller-apply">
     <header className="seller-apply-top"><Link to="/" aria-label="DrawBay home"><Logo/></Link>
-      <span className="seller-top-note">SELL WITH DRAWBAY <i/> <Link to="/seller/sign-in">Already a member? Sign in</Link></span>
+      <span className="seller-top-note"><span className="seller-top-prompt">SELL WITH DRAWBAY <i/></span><Link to="/seller/sign-in"><span className="seller-desktop-label">Already a member? Sign in</span><span className="seller-mobile-label">Sign in</span></Link></span>
     </header>
     <div className="seller-apply-shell">
       <aside className="seller-apply-aside">
