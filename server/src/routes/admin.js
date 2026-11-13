@@ -1,6 +1,21 @@
 import { query, transaction, projectOut, orderOut, log } from '../lib.js';
 import { wrap, need, bad } from '../middleware.js';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
+let portfolioStorage;
+function storage() {
+  if (!process.env.S3_BUCKET) throw Object.assign(new Error('File storage is not configured'), { status: 503 });
+  if (!portfolioStorage) portfolioStorage = new S3Client({
+    region: process.env.S3_REGION || 'us-east-1',
+    endpoint: process.env.S3_ENDPOINT || undefined,
+    forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
+    credentials: process.env.S3_ACCESS_KEY_ID && process.env.S3_SECRET_ACCESS_KEY ? {
+      accessKeyId: process.env.S3_ACCESS_KEY_ID, secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+    } : undefined
+  });
+  return portfolioStorage;
+}
 export default function adminRoutes(app) {
   app.get('/api/admin/stats', need('admin'), wrap(async (_req,res) => {
     const { rows } = await query(`SELECT
@@ -92,6 +107,43 @@ export default function adminRoutes(app) {
   app.get('/api/admin/payouts', need('admin'), wrap(async (_req,res) => { const { rows }=await query('SELECT id,seller_id,amount,status,created_at FROM payouts ORDER BY created_at DESC'); res.json(rows.map(p=>({id:p.id,sellerId:p.seller_id,amount:Number(p.amount),status:p.status,date:p.created_at.toISOString().slice(0,10)}))); }));
   app.get('/api/admin/audit', need('admin'), wrap(async (_req,res) => { const { rows }=await query("SELECT to_char(created_at,'YYYY-MM-DD HH24:MI:SS') AS when,who,what FROM audit ORDER BY id DESC LIMIT 1000"); res.json(rows); }));
   app.get('/api/admin/users', need('admin'), wrap(async (_req,res) => { const { rows }=await query('SELECT id,name,email,role,verified,created_at FROM users ORDER BY created_at DESC'); res.json(rows); }));
+  app.get('/api/admin/seller-applications', need('admin'), wrap(async (_req,res) => {
+    const { rows } = await query(`SELECT u.id,u.name,u.email,u.created_at,sp.studio,sp.bio,sp.location,sp.phone,sp.country,sp.city,
+      sp.professional_title,sp.years_experience,sp.registration_body,sp.license_number,sp.specializations,
+      sp.portfolio_website,sp.linkedin_url,sp.portfolio_object_key,sp.application_status
+      FROM users u JOIN seller_profiles sp ON sp.user_id=u.id
+      WHERE sp.application_status='pending' ORDER BY u.created_at ASC`);
+    res.json(await Promise.all(rows.map(async application => ({
+      ...application,
+      portfolioUrl: application.portfolio_object_key
+        ? await getSignedUrl(storage(), new GetObjectCommand({ Bucket: process.env.S3_BUCKET, Key: application.portfolio_object_key }), { expiresIn: 900 })
+        : null
+    }))));
+  }));
+  app.post('/api/admin/seller-applications/:id/approve', need('admin'), wrap(async (req,res) => {
+    const result = await transaction(async client => {
+      const { rows } = await client.query(`UPDATE seller_profiles SET application_status='approved',verified=true
+        WHERE user_id=$1 AND application_status='pending' RETURNING user_id`, [req.params.id]);
+      if (!rows[0]) return false;
+      await client.query('INSERT INTO notifications (user_id,message) VALUES ($1,$2)', [rows[0].user_id, 'Your seller application has been approved. You can now submit projects for review.']);
+      await log(req.user.email, `Approved seller application ${rows[0].user_id}`, client);
+      return true;
+    });
+    result ? res.json({ message: 'Seller application approved' }) : res.status(409).json({ error: 'Seller application is no longer pending' });
+  }));
+  app.post('/api/admin/seller-applications/:id/reject', need('admin'), wrap(async (req,res) => {
+    const reason = String(req.body?.reason || '').trim();
+    if (reason.length < 5 || reason.length > 1000) return bad(res, 'Add a review reason (5–1000 characters)');
+    const result = await transaction(async client => {
+      const { rows } = await client.query(`UPDATE seller_profiles SET application_status='rejected',verified=false
+        WHERE user_id=$1 AND application_status='pending' RETURNING user_id`, [req.params.id]);
+      if (!rows[0]) return false;
+      await client.query('INSERT INTO notifications (user_id,message) VALUES ($1,$2)', [rows[0].user_id, `Your seller application was not approved: ${reason}`]);
+      await log(req.user.email, `Rejected seller application ${rows[0].user_id}: ${reason}`, client);
+      return true;
+    });
+    result ? res.json({ message: 'Seller application declined' }) : res.status(409).json({ error: 'Seller application is no longer pending' });
+  }));
   app.get('/api/admin/settings', need('admin'), wrap(async (_req,res) => { const { rows }=await query('SELECT commission_rate,processing_rate,upload_fee FROM settings WHERE id=true'); const s=rows[0]; res.json({commissionRate:Number(s.commission_rate),processingRate:Number(s.processing_rate),uploadFee:Number(s.upload_fee)}); }));
   app.put('/api/admin/categories', need('admin'), wrap(async (req,res) => {
     const names=[...new Set((Array.isArray(req.body?.categories)?req.body.categories:[]).map(x=>String(x).trim()).filter(x=>x.length>=2&&x.length<=100))];

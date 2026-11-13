@@ -48,6 +48,8 @@ The server computes checkout amounts from published listings and initializes Pay
 
 Seller files upload directly to private S3-compatible storage using short-lived signed URLs. Only paid buyers can request five-minute download links. Listing previews are served through a public, read-only preview endpoint after publication. Configure malware scanning and moderation for user-uploaded files before opening uploads to the public.
 
+Architects and sellers apply through five separate pages at `/seller/sign-up`: personal details, professional details, portfolio, account security, and final review. Application details are stored with the seller profile; new applications remain `pending` until an administrator approves them from **Admin → Sellers**. Project creation, file upload, and upload-fee checkout are unavailable until approval. Existing seller profiles are preserved as approved by the additive schema migration. Portfolio PDFs use the private S3 bucket and require the same bucket configuration and browser `PUT` CORS policy as other seller uploads.
+
 Paystack transfers require a funded platform balance and transfer approval settings on the Paystack account. Seller payout destinations are registered with Paystack; Guaranteed Impressions stores only the recipient reference and masked account details. Payout status changes to completed or failed only after signed Paystack transfer webhooks.
 
 ## Project structure
@@ -64,4 +66,4 @@ The API exposes `GET /api/health` for deployment health checks. It returns HTTP 
 
 This repository contains the production-oriented application code and deployment scaffold. It cannot be made publicly live from the local workspace alone: deployment still needs the business’s domain/hosting account, production PostgreSQL, Paystack live account and webhook, email sender verification, private object-storage bucket, and production secrets. Before accepting customers, publish counsel-reviewed terms, privacy/refund policies, and complete the applicable business, tax, consumer-protection, and data-protection reviews for the markets where Guaranteed Impressions will operate.
 
-The current environment could not download npm dependencies, so the frontend build and live browser preview have not yet been verified here.
+Run `npm run build` and `npm test` from the project root to verify frontend types, production assets, and the API routing tests.

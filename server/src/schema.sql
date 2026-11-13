@@ -25,6 +25,20 @@ ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS payout_bank text;
 ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS payout_bank_code text;
 ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS payout_account_name text;
 ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS payout_last4 text;
+ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS application_status text NOT NULL DEFAULT 'approved'
+  CHECK (application_status IN ('pending','approved','rejected'));
+ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS phone text NOT NULL DEFAULT '';
+ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS country text NOT NULL DEFAULT '';
+ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS city text NOT NULL DEFAULT '';
+ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS professional_title text NOT NULL DEFAULT '';
+ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS years_experience integer NOT NULL DEFAULT 0;
+ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS registration_body text NOT NULL DEFAULT '';
+ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS license_number text NOT NULL DEFAULT '';
+ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS specializations jsonb NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS portfolio_website text NOT NULL DEFAULT '';
+ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS linkedin_url text NOT NULL DEFAULT '';
+ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS portfolio_object_key text;
+ALTER TABLE seller_profiles ADD COLUMN IF NOT EXISTS declarations jsonb NOT NULL DEFAULT '{}'::jsonb;
 
 CREATE TABLE IF NOT EXISTS projects (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

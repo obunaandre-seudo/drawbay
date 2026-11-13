@@ -14,7 +14,7 @@ export default function stateRoutes(app) {
       ? 'SELECT * FROM orders WHERE seller_id=$1 ORDER BY created_at DESC' : 'SELECT * FROM orders WHERE buyer_id=$1 ORDER BY created_at DESC';
     const [projects, sellers, buyers, orders, payouts, settings, wishlist, cart, audit, notifications, support, categories] = await Promise.all([
       query(projectSql, projectParams),
-      query(`SELECT u.id,u.name,${isAdmin ? 'u.email' : "'' AS email"},u.verified,sp.slug,sp.studio,sp.bio,sp.location,sp.verified AS studio_verified
+      query(`SELECT u.id,u.name,${isAdmin ? 'u.email' : "'' AS email"},u.verified,sp.slug,sp.studio,sp.bio,sp.location,sp.verified AS studio_verified,sp.application_status
         FROM users u LEFT JOIN seller_profiles sp ON sp.user_id=u.id WHERE u.role='seller' ORDER BY u.created_at DESC`),
       query(isAdmin ? "SELECT id,name,email,to_char(created_at,'YYYY-MM-DD') AS joined FROM users WHERE role='buyer' ORDER BY created_at DESC" : 'SELECT 1 WHERE false'),
       query(orderSql, isAdmin ? [] : [user.id]),
@@ -31,7 +31,7 @@ export default function stateRoutes(app) {
       query('SELECT name AS category FROM categories ORDER BY name')
     ]);
     const settingsRow = settings.rows[0] || { commission_rate: 0.15, processing_rate: 0.015, upload_fee: 10000 };
-    const sellerData = sellers.rows.map(s => ({ id: s.id, slug: s.slug || s.id, name: s.name, studio: s.studio || s.name, bio: s.bio || '', location: s.location || '', email: s.email, verified: !!s.studio_verified }));
+    const sellerData = sellers.rows.map(s => ({ id: s.id, slug: s.slug || s.id, name: s.name, studio: s.studio || s.name, bio: s.bio || '', location: s.location || '', email: s.email, verified: !!s.studio_verified, applicationStatus: s.application_status || 'approved' }));
     res.json({
       projects: projects.rows.map(projectOut), sellers: sellerData,
       buyers: buyers.rows.map(b => ({ id: b.id, name: b.name, email: b.email, joined: b.joined })),
@@ -48,7 +48,7 @@ export default function stateRoutes(app) {
     const [projects,sellers,categories] = await Promise.all([
       query("SELECT * FROM projects WHERE status='published' ORDER BY featured DESC,created_at DESC LIMIT 200"),
       query(`SELECT u.id,u.name,sp.slug,sp.studio,sp.bio,sp.location,sp.verified
-        FROM users u JOIN seller_profiles sp ON sp.user_id=u.id WHERE u.role='seller' ORDER BY u.created_at DESC`),
+        FROM users u JOIN seller_profiles sp ON sp.user_id=u.id WHERE u.role='seller' AND sp.application_status='approved' ORDER BY u.created_at DESC`),
       query('SELECT name AS category FROM categories ORDER BY name')
     ]);
     res.json({

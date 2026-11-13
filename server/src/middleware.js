@@ -17,4 +17,11 @@ export const need = (...roles) => wrap(async (req, res, next) => {
   req.user = user;
   next();
 });
+export const approvedSeller = wrap(async (req, res, next) => {
+  const { rows } = await query('SELECT application_status FROM seller_profiles WHERE user_id=$1', [req.user.id]);
+  if (rows[0]?.application_status !== 'approved') {
+    return res.status(403).json({ error: 'Seller features are available after your application is approved', code: 'seller_pending' });
+  }
+  next();
+});
 export const bad = (res, message) => res.status(400).json({ error: message });

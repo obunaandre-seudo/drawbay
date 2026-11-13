@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { query, transaction, log } from '../lib.js';
-import { wrap, need, bad } from '../middleware.js';
+import { wrap, need, approvedSeller, bad } from '../middleware.js';
 
 const paystackKey = () => process.env.PAYSTACK_SECRET_KEY;
 const newReference = () => `drawbay_${crypto.randomUUID().replaceAll('-', '')}`;
@@ -92,7 +92,7 @@ export default function paymentRoutes(app) {
     res.status(201).json(await initializePayment({ user: req.user, purpose: 'checkout', amount, metadata: { items,commissionRate:Number(settings.commission_rate) } }));
   }));
 
-  app.post('/api/seller/projects/:id/upload-fee/checkout', need('seller'), wrap(async (req, res) => {
+  app.post('/api/seller/projects/:id/upload-fee/checkout', need('seller'), approvedSeller, wrap(async (req, res) => {
     const { rows } = await query("SELECT id,title,status,fee_paid FROM projects WHERE id=$1 AND seller_id=$2", [req.params.id, req.user.id]);
     const project = rows[0];
     if (!project) return res.status(404).json({ error: 'Project not found' });

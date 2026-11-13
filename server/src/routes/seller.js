@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { query, transaction, projectOut } from '../lib.js';
-import { wrap, need, bad } from '../middleware.js';
+import { wrap, need, approvedSeller, bad } from '../middleware.js';
 
 const slugify = value => String(value || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80) || 'project';
 const allowedEdit = ['title','desc','category','style','price','bedrooms','bathrooms','floors','img'];
@@ -28,7 +28,7 @@ export default function sellerRoutes(app) {
     res.json(rows.map(projectOut));
   }));
 
-  app.post('/api/seller/projects', need('seller'), wrap(async (req,res) => {
+  app.post('/api/seller/projects', need('seller'), approvedSeller, wrap(async (req,res) => {
     const body = req.body || {};
     const issue = validateProject(body);
     if (issue) return bad(res, issue);
@@ -39,7 +39,7 @@ export default function sellerRoutes(app) {
     res.status(201).json(projectOut(rows[0]));
   }));
 
-  app.patch('/api/seller/projects/:id', need('seller'), wrap(async (req,res) => {
+  app.patch('/api/seller/projects/:id', need('seller'), approvedSeller, wrap(async (req,res) => {
     const { rows } = await query('SELECT * FROM projects WHERE id=$1 AND seller_id=$2', [req.params.id,req.user.id]);
     const project = rows[0];
     if (!project) return res.status(404).json({ error: 'Project not found' });
@@ -53,14 +53,14 @@ export default function sellerRoutes(app) {
     res.json(projectOut(updated[0]));
   }));
 
-  app.post('/api/seller/projects/:id/archive', need('seller'), wrap(async (req,res) => {
+  app.post('/api/seller/projects/:id/archive', need('seller'), approvedSeller, wrap(async (req,res) => {
     const {rows}=await query("UPDATE projects SET status='archived' WHERE id=$1 AND seller_id=$2 AND status='published' RETURNING *",[req.params.id,req.user.id]);
     rows[0]?res.json(projectOut(rows[0])):res.status(409).json({error:'Only published projects can be archived'});
   }));
 
-  app.post('/api/seller/projects/:id/upload-fee', need('seller'), (_req,res) => res.status(409).json({ error: 'Use the Paystack upload-fee checkout flow' }));
+  app.post('/api/seller/projects/:id/upload-fee', need('seller'), approvedSeller, (_req,res) => res.status(409).json({ error: 'Use the Paystack upload-fee checkout flow' }));
 
-  app.post('/api/seller/projects/:id/submit', need('seller'), wrap(async (req,res) => {
+  app.post('/api/seller/projects/:id/submit', need('seller'), approvedSeller, wrap(async (req,res) => {
     const result = await transaction(async client => {
       const { rows } = await client.query('SELECT * FROM projects WHERE id=$1 AND seller_id=$2 FOR UPDATE', [req.params.id,req.user.id]);
       const project = rows[0];

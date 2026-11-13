@@ -3,7 +3,7 @@ import path from 'node:path';
 import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { query, transaction } from '../lib.js';
-import { wrap, need, bad } from '../middleware.js';
+import { wrap, need, approvedSeller, bad } from '../middleware.js';
 
 let client;
 const bucket = () => process.env.S3_BUCKET;
@@ -23,7 +23,7 @@ const mimeAllowed = new Set(['application/pdf','application/zip','application/x-
 const cleanName = name => path.basename(String(name || 'file')).replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 150) || 'file';
 
 export default function fileRoutes(app) {
-  app.post('/api/seller/projects/:id/files/presign', need('seller'), wrap(async (req, res) => {
+  app.post('/api/seller/projects/:id/files/presign', need('seller'), approvedSeller, wrap(async (req, res) => {
     const name = cleanName(req.body?.name);
     const contentType = String(req.body?.contentType || '');
     const size = Number(req.body?.size);
@@ -36,7 +36,7 @@ export default function fileRoutes(app) {
     res.json({ method: 'PUT', url: await getSignedUrl(storage(), command, { expiresIn: 300 }), key, headers: { 'Content-Type': contentType } });
   }));
 
-  app.post('/api/seller/projects/:id/files/complete', need('seller'), wrap(async (req, res) => {
+  app.post('/api/seller/projects/:id/files/complete', need('seller'), approvedSeller, wrap(async (req, res) => {
     const key = String(req.body?.key || '');
     const displayName = cleanName(req.body?.name);
     const kind = req.body?.kind === 'preview' ? 'preview' : 'deliverable';

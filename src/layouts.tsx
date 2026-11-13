@@ -26,6 +26,9 @@ export function DashLayout({role}:{role:Role}) {
   if(!db.session) return <Navigate to={`/${role}/sign-in`} replace/>;
   if(db.session!==role) return <Navigate to="/access-denied" replace/>;
   const crumbs=loc.pathname.split('/').filter(Boolean);
+  const sellerApplication=role==='seller'?db.sellers.find(s=>s.id===db.currentUser?.id)?.applicationStatus:'approved';
   return <div className="dash"><aside className={o?'open':''}><Link to="/"><Logo/></Link><small className="cap">{role} area</small>{NAV[role].map(([p,l])=><NavLink key={p} end to={`/${role}/${p}`} onClick={()=>setO(false)}>{l}</NavLink>)}<button className="link" onClick={()=>{void setSession(null)}}>Sign out</button></aside>
-  <section><header className="bar"><button className="btn ghost menu" onClick={()=>setO(!o)} aria-expanded={o}>☰ Menu</button><nav aria-label="Breadcrumb" className="crumbs">{crumbs.join(' / ')}</nav><div className="row"><ThemeToggle/><Link to={`/${role}/notifications`}>Notifications ({db.notifications.length})</Link></div></header><main className="pad"><Outlet/></main></section><Toaster/></div>;
+  <section><header className="bar"><button className="btn ghost menu" onClick={()=>setO(!o)} aria-expanded={o}>☰ Menu</button><nav aria-label="Breadcrumb" className="crumbs">{crumbs.join(' / ')}</nav><div className="row"><ThemeToggle/><Link to={`/${role}/notifications`}>Notifications ({db.notifications.length})</Link></div></header><main className="pad">
+    {role==='seller'&&sellerApplication!=='approved'&&<div className="seller-approval-banner" role="status"><b>{sellerApplication==='rejected'?'Application needs attention':'Your application is under review'}</b><span>{sellerApplication==='rejected'?'Please contact support for next steps.':'Project uploads and publishing will be available once an administrator approves your profile.'}</span></div>}
+    <Outlet/></main></section><Toaster/></div>;
 }

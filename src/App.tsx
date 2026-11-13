@@ -90,6 +90,8 @@ const AdminNotifications = lazy(() => import('./pages/admin/Notifications'));
 // One file per page lives in src/pages/<area>/. Routes are declared here.
 function PageLoader() { return <main className="page-loader" aria-busy="true" aria-label="Loading"><div className="loading-dots" aria-hidden="true"><span/><span/><span/></div></main>; }
 export default function App() { return <BrowserRouter><Suspense fallback={<PageLoader/>}><Routes>
+  <Route path="/seller/sign-up" element={<AuthSellerSignUp/>}/>
+  <Route path="/seller/sign-up/:step" element={<AuthSellerSignUp/>}/>
   <Route element={<PublicLayout/>}>
     <Route path="/" element={<PublicWelcome/>}/>
     <Route path="/get-started" element={<PublicGetStarted/>}/>
@@ -110,7 +112,6 @@ export default function App() { return <BrowserRouter><Suspense fallback={<PageL
     <Route path="/buyer/forgot-password" element={<AuthBuyerForgotPassword/>}/>
     <Route path="/buyer/reset-password" element={<AuthBuyerResetPassword/>}/>
     <Route path="/buyer/verify-email" element={<AuthBuyerVerifyEmail/>}/>
-    <Route path="/seller/sign-up" element={<AuthSellerSignUp/>}/>
     <Route path="/seller/sign-in" element={<AuthSellerSignIn/>}/>
     <Route path="/seller/forgot-password" element={<AuthSellerForgotPassword/>}/>
     <Route path="/seller/reset-password" element={<AuthSellerResetPassword/>}/>

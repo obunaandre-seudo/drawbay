@@ -1,5 +1,5 @@
 import { useEffect, useSyncExternalStore } from 'react';
-import type { Db, Project, Role } from '../types';
+import type { Db, Project, Role, SellerApplication } from '../types';
 
 const apiBase = (import.meta as any).env?.VITE_API_BASE || '/api';
 const empty: Db = {
@@ -90,6 +90,18 @@ export async function signIn(role: Role,email: string,password: string) {
   return result.user;
 }
 export const signUp = (role: Exclude<Role,'admin'>, name: string,email: string,password: string) => request('/auth/register',{method:'POST',body:JSON.stringify({role,name,email,password})});
+export const uploadSellerPortfolio = async (file: File) => {
+  const signed = await request<{key:string;url:string;method:'PUT';headers:Record<string,string>}>('/auth/seller-application/portfolio-url',{
+    method:'POST',body:JSON.stringify({name:file.name,contentType:file.type,size:file.size})
+  });
+  const response = await fetch(signed.url,{method:signed.method,headers:signed.headers,body:file});
+  if (!response.ok) throw new ApiError('Portfolio PDF upload failed. Please try again.',response.status);
+  return { key:signed.key,name:file.name };
+};
+export const submitSellerApplication = (application: Record<string,unknown>) => request<{message:string}>('/auth/seller-application',{method:'POST',body:JSON.stringify(application)});
+export const getSellerApplications = () => request<SellerApplication[]>('/admin/seller-applications');
+export const approveSellerApplication = (id:string) => request<{message:string}>(`/admin/seller-applications/${encodeURIComponent(id)}/approve`,{method:'POST',body:'{}'});
+export const rejectSellerApplication = (id:string,reason:string) => request<{message:string}>(`/admin/seller-applications/${encodeURIComponent(id)}/reject`,{method:'POST',body:JSON.stringify({reason})});
 export const verifyEmail = (token: string) => request('/auth/verify-email',{method:'POST',body:JSON.stringify({token})});
 export const resendVerification = (email: string) => request('/auth/resend-verification',{method:'POST',body:JSON.stringify({email})});
 export const requestPasswordReset = (email: string) => request('/auth/forgot-password',{method:'POST',body:JSON.stringify({email})});
