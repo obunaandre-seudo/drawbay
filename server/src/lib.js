@@ -23,9 +23,9 @@ export const safeUser = u => ({ id: u.id, name: u.name, email: u.email, role: u.
 export const sign = u => jwt.sign({ sub: u.id, role: u.role }, SECRET, { expiresIn: '8h', issuer: 'drawbay' });
 export const projectOut = p => ({
   id: p.id, slug: p.slug, title: p.title, desc: p.description, category: p.category, style: p.style,
-  price: Number(p.price), bedrooms: p.bedrooms, bathrooms: p.bathrooms, floors: p.floors,
+  price: p.slug?.startsWith('drawbay-test-plan-') ? 0 : Number(p.price), bedrooms: p.bedrooms, bathrooms: p.bathrooms, floors: p.floors,
   sellerId: p.seller_id, img: p.img, status: p.status, featured: p.featured,
-  popularity: p.popularity, date: p.created_at?.toISOString?.().slice(0, 10) || p.created_at,
+  popularity: p.popularity, feePaid: !!p.fee_paid, date: p.created_at?.toISOString?.().slice(0, 10) || p.created_at,
   files: p.files || [], feedback: p.feedback || undefined
 });
 export const orderOut = o => ({

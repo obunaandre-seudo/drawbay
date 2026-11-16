@@ -84,7 +84,7 @@ export default function paymentRoutes(app) {
       if (!/^[0-9a-f-]{36}$/i.test(projectId) || !Number.isInteger(qty) || qty < 1 || qty > 99) return bad(res, 'Cart contains an invalid item');
       quantities.set(projectId, (quantities.get(projectId) || 0) + qty);
     }
-    const { rows } = await query('SELECT id,seller_id,price FROM projects WHERE status=\'published\' AND id=ANY($1::uuid[])', [[...quantities.keys()]]);
+    const { rows } = await query('SELECT id,seller_id,price FROM projects WHERE status=\'published\' AND slug NOT LIKE \'drawbay-test-plan-%\' AND id=ANY($1::uuid[])', [[...quantities.keys()]]);
     if (rows.length !== quantities.size) return res.status(409).json({ error: 'A project in your cart is no longer available' });
     const items = rows.map(p => ({ projectId: p.id, sellerId: p.seller_id, unitPrice: Number(p.price), qty: quantities.get(p.id) }));
     const amount = items.reduce((sum, item) => sum + item.unitPrice * item.qty, 0);
